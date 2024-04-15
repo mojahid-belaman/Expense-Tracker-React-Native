@@ -1,1 +1,1 @@
-# Expense-Tracker-React-Native
+# Expense Tracker
