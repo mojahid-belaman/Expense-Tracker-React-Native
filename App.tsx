@@ -5,54 +5,53 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import ManageExpense from "./screens/ManageExpense";
-import { screenOptions } from "./constants/styles";
+import { screenStackOptions, screenTabOptions } from "./constants/styles";
 import RecentExpenses from "./screens/RecentExpenses";
 import AllExpenses from "./screens/AllExpenses";
+import IconButton from "./components/UI/IconButton";
+import { BottomTabParamList, RootStackParamList } from "./types/screenType";
+import ExpenseProvider from "./store/context/expenseContext";
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-
-const screens = [
-  {
-    name: "RecentExpenses",
-    component: RecentExpenses,
-    options: {
-      title: "Recent Expenses",
-      tabBarLabel: "Recent",
-      tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-        <Ionicons name="hourglass" color={color} size={size} />
-      ),
-    },
-  },
-  {
-    name: "AllExpenses",
-    component: AllExpenses,
-    options: {
-      title: "All Expenses",
-      tabBarLabel: "All Expenses",
-      tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-        <Ionicons name="calendar" color={color} size={size} />
-      ),
-    },
-  },
-  // Add more screens as needed
-];
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 function ExpensesOverview() {
   return (
     <Tab.Navigator
-      screenOptions={{
-        ...screenOptions,
-      }}
+      screenOptions={({ navigation }) => ({
+        ...screenTabOptions,
+        headerRight: ({ tintColor }) => (
+          <IconButton
+            icon="add"
+            color={tintColor}
+            size={24}
+            onPress={() => navigation.navigate("ManageExpense")}
+          />
+        ),
+      })}
     >
-      {screens.map((screen, index) => (
-        <Stack.Screen
-          key={index}
-          name={screen.name}
-          component={screen.component}
-          options={screen.options}
-        />
-      ))}
+      <Tab.Screen
+        name="RecentExpenses"
+        component={RecentExpenses}
+        options={{
+          title: "Recent Expenses",
+          tabBarLabel: "Recent",
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <Ionicons name="hourglass" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="AllExpenses"
+        component={AllExpenses}
+        options={{
+          title: "All Expenses",
+          tabBarLabel: "All Expenses",
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+            <Ionicons name="calendar" color={color} size={size} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }
@@ -61,18 +60,30 @@ export default function App() {
   return (
     <>
       <StatusBar style="light" />
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="ExpenseOverview"
-            component={ExpensesOverview}
-            options={{
-              headerShown: false,
+      <ExpenseProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              ...screenStackOptions,
             }}
-          />
-          <Stack.Screen name="ManageExpense" component={ManageExpense} />
-        </Stack.Navigator>
-      </NavigationContainer>
+          >
+            <Stack.Screen
+              name="ExpenseOverview"
+              component={ExpensesOverview}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="ManageExpense"
+              component={ManageExpense}
+              options={{
+                presentation: "modal",
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ExpenseProvider>
     </>
   );
 }
