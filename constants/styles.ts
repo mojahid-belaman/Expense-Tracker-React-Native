@@ -13,7 +13,7 @@ export const colors = {
   gray700: "#221c30",
 };
 
-export const screenOptions = {
+export const screenTabOptions = {
   headerStyle: { backgroundColor: colors.primary500 },
   headerTintColor: "white",
   tabBarStyle: {
@@ -24,5 +24,15 @@ export const screenOptions = {
   tabBarActiveTintColor: colors.accent500,
   tabBarLabelStyle: {
     fontSize: 12,
+  },
+};
+
+export const screenStackOptions = {
+  headerStyle: {
+    backgroundColor: colors.primary500,
+  },
+  headerTintColor: "white",
+  contentStyle: {
+    backgroundColor: colors.primary700,
   },
 };
