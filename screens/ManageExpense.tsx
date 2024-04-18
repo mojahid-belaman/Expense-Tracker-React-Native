@@ -6,6 +6,7 @@ import IconButton from "../components/UI/IconButton";
 import { colors } from "../constants/styles";
 import Button from "../components/UI/Button";
 import { ExpenseCtx } from "../store/context/expenseContext";
+import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
 const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
   const { addExpense, updateExpense, deleteExpense } = useContext(ExpenseCtx);
@@ -59,6 +60,7 @@ const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
 
   return (
     <View style={styles.container}>
+      <ExpenseForm />
       <View style={styles.buttons}>
         <Button mode="fat" style={styles.button} onPress={cancelHandler}>
           Cancel
