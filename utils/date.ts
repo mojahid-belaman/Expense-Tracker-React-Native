@@ -1,11 +1,5 @@
 export function getFormatterDate(date: Date): string {
-  const months =
-    date.getMonth() + 1 < 10
-      ? "0" + (date.getMonth() + 1)
-      : date.getMonth() + 1;
-  const days =
-    date.getDay() < 10 ? "0" + (date.getDay() + 1) : date.getDay() + 1;
-  return `${date.getFullYear()}-${months}-${days}`;
+  return date.toISOString().slice(0, 10);
 }
 
 export function getDateLast7Days(date: Date, days: number) {
