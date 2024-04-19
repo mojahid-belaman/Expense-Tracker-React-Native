@@ -14,18 +14,22 @@ interface IInput {
   label: string;
   inputConfig?: TextInputProps;
   style?: StyleProp<ViewStyle>;
+  isValid: boolean;
 }
 
-function Input({ label, inputConfig, style }: IInput) {
+function Input({ label, inputConfig, style, isValid }: IInput) {
   const inputStyle: StyleProp<ViewStyle> = [styles.input];
 
   if (inputConfig && inputConfig.multiline) {
     inputStyle.push(styles.inputMultiline);
   }
 
+  if (!isValid) {
+    inputStyle.push(styles.inputError);
+  }
   return (
     <View style={[styles.inputContainer, style]}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, !isValid && styles.labelError]}>{label}</Text>
       <TextInput style={inputStyle} {...inputConfig} />
     </View>
   );
@@ -53,5 +57,11 @@ const styles = StyleSheet.create({
   inputMultiline: {
     minHeight: 100,
     textAlignVertical: "top",
+  },
+  labelError: {
+    color: colors.error500,
+  },
+  inputError: {
+    backgroundColor: colors.error50,
   },
 });
