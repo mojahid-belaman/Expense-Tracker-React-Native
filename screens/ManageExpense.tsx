@@ -4,13 +4,16 @@ import { Alert, StyleSheet, View } from "react-native";
 import { PropsManageExpense } from "../types/screenType";
 import IconButton from "../components/UI/IconButton";
 import { colors } from "../constants/styles";
-import Button from "../components/UI/Button";
-import { ExpenseCtx } from "../store/context/expenseContext";
+import { ExpenseCtx, expenseType } from "../store/context/expenseContext";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
 const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
-  const { addExpense, updateExpense, deleteExpense } = useContext(ExpenseCtx);
+  const { expenses, addExpense, updateExpense, deleteExpense } =
+    useContext(ExpenseCtx);
   const editedExpenseId = route.params?.expenseId;
+  const getExpenseEdit = expenses.find(
+    (expense) => expense.id === editedExpenseId
+  );
   const isEdited = !!editedExpenseId;
 
   useLayoutEffect(() => {
@@ -37,20 +40,9 @@ const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
     }
   }
 
-  function confirmHandler() {
-    if (isEdited)
-      updateExpense({
-        id: editedExpenseId,
-        description: "test!!!",
-        amount: 30.33,
-        date: new Date("2024-01-1"),
-      });
-    else
-      addExpense({
-        description: "test",
-        amount: 70.33,
-        date: new Date("2024-01-18"),
-      });
+  function confirmHandler(expense: Omit<expenseType, "id">) {
+    if (isEdited) updateExpense({ id: editedExpenseId, ...expense });
+    else addExpense(expense);
     navigation.goBack();
   }
 
@@ -60,15 +52,12 @@ const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
 
   return (
     <View style={styles.container}>
-      <ExpenseForm />
-      <View style={styles.buttons}>
-        <Button mode="fat" style={styles.button} onPress={cancelHandler}>
-          Cancel
-        </Button>
-        <Button style={styles.button} onPress={confirmHandler}>
-          {isEdited ? "Update" : "Add"}
-        </Button>
-      </View>
+      <ExpenseForm
+        submitLabel={isEdited ? "Update" : "Add"}
+        fillField={getExpenseEdit}
+        onSubmit={confirmHandler}
+        onCancel={cancelHandler}
+      />
       <View style={styles.deleteContainer}>
         {isEdited && (
           <IconButton
@@ -89,15 +78,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-  },
-  buttons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  button: {
-    minWidth: 120,
-    marginHorizontal: 10,
   },
   deleteContainer: {
     marginTop: 16,
