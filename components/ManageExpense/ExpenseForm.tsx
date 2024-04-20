@@ -6,6 +6,7 @@ import { colors } from "../../constants/styles";
 import Button from "../UI/Button";
 import { expenseType } from "../../store/context/expenseContext";
 import { getFormatterDate } from "../../utils/date";
+import LoadingOverlay from "../UI/LoadingOverlay";
 
 interface IExpenseState {
   amount: { value: string; isValid: boolean };
@@ -16,12 +17,13 @@ interface IExpenseState {
 interface IExpenseForm {
   submitLabel: string;
   fillField: expenseType | undefined;
+  loading: boolean;
   onSubmit: (expense: Omit<expenseType, "id">) => void;
   onCancel: () => void;
 }
 
 function ExpenseForm(props: IExpenseForm) {
-  const { onCancel, submitLabel, onSubmit, fillField } = props;
+  const { onCancel, submitLabel, onSubmit, fillField, loading } = props;
   const [expenseState, setExpenseState] = useState<IExpenseState>({
     amount: { value: fillField?.amount.toString() || "", isValid: true },
     date: {
@@ -114,9 +116,13 @@ function ExpenseForm(props: IExpenseForm) {
         <Button mode="fat" style={styles.button} onPress={onCancel}>
           Cancel
         </Button>
-        <Button style={styles.button} onPress={submitHandler}>
-          {submitLabel}
-        </Button>
+        {loading ? (
+          <LoadingOverlay indicatorConfig={{ size: "small", color: "white" }} />
+        ) : (
+          <Button style={styles.button} onPress={submitHandler}>
+            {submitLabel}
+          </Button>
+        )}
       </View>
     </View>
   );
