@@ -8,11 +8,14 @@ import { ExpenseCtx, expenseType } from "../store/context/expenseContext";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 import { editExpense, postExpense, trashExpense } from "../utils/api";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
+import ErrorOverlay from "../components/UI/ErrorOverlay";
 
 const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
   const { expenses, addExpense, updateExpense, deleteExpense } =
     useContext(ExpenseCtx);
+
   const editedExpenseId = route.params?.expenseId;
   const getExpenseEdit = expenses.find(
     (expense) => expense.id === editedExpenseId
@@ -35,10 +38,15 @@ const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
         {
           text: "DELETE",
           async onPress() {
-            setLoading(true);
-            await trashExpense(editedExpenseId);
-            deleteExpense(editedExpenseId);
-            navigation.goBack();
+            try {
+              setLoading(true);
+              await trashExpense(editedExpenseId);
+              deleteExpense(editedExpenseId);
+              navigation.goBack();
+            } catch (err: any) {
+              setError(err.message);
+            }
+            setLoading(false);
           },
         },
       ]);
@@ -46,26 +54,33 @@ const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
   }
 
   async function confirmHandler(expense: Omit<expenseType, "id">) {
-    if (isEdited) {
+    try {
       setLoading(true);
-      updateExpense({ id: editedExpenseId, ...expense });
-      await editExpense({ id: editedExpenseId, ...expense });
-    } else {
-      setLoading(true);
-      const id: string = await postExpense(expense);
-      const expenseData = {
-        id,
-        ...expense,
-      };
-      addExpense(expenseData);
+      if (isEdited) {
+        updateExpense({ id: editedExpenseId, ...expense });
+        await editExpense({ id: editedExpenseId, ...expense });
+      } else {
+        const id: string = await postExpense(expense);
+        const expenseData = {
+          id,
+          ...expense,
+        };
+        addExpense(expenseData);
+      }
+      navigation.goBack();
+    } catch (error: any) {
+      setError(error.message);
     }
-    navigation.goBack();
+    setLoading(false);
   }
 
   function cancelHandler() {
     navigation.goBack();
   }
 
+  if (error) {
+    return <ErrorOverlay message={error} />;
+  }
   return (
     <View style={styles.container}>
       <ExpenseForm
