@@ -117,7 +117,10 @@ function ExpenseForm(props: IExpenseForm) {
           Cancel
         </Button>
         {loading ? (
-          <LoadingOverlay indicatorConfig={{ size: "small", color: "white" }} />
+          <LoadingOverlay
+            styleContainer={styles.button}
+            indicatorConfig={{ size: "small", color: "white" }}
+          />
         ) : (
           <Button style={styles.button} onPress={submitHandler}>
             {submitLabel}
