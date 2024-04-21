@@ -44,9 +44,9 @@ const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
               deleteExpense(editedExpenseId);
               navigation.goBack();
             } catch (err: any) {
+              setLoading(false);
               setError(err.message);
             }
-            setLoading(false);
           },
         },
       ]);
@@ -69,9 +69,9 @@ const ManageExpense = ({ navigation, route }: PropsManageExpense) => {
       }
       navigation.goBack();
     } catch (error: any) {
+      setLoading(false);
       setError(error.message);
     }
-    setLoading(false);
   }
 
   function cancelHandler() {
