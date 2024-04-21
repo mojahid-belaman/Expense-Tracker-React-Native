@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
 import Expenses from "../components/Expenses/Expenses";
@@ -7,9 +7,13 @@ import { getDateLast7Days } from "../utils/date";
 import { getExpenses } from "../utils/api";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { colors } from "../constants/styles";
+import ErrorOverlay from "../components/UI/ErrorOverlay";
 
 function RecentExpenses() {
   const { expenses, setExpenses } = useContext(ExpenseCtx);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
   const last7Days = getDateLast7Days(new Date(), 7);
   const recentExpenses = expenses.filter(
     (expense) => expense.date >= last7Days && expense.date <= new Date()
@@ -17,13 +21,23 @@ function RecentExpenses() {
 
   useEffect(() => {
     async function fetchExpenses() {
-      const expenses = await getExpenses();
-      setExpenses(expenses);
+      try {
+        setLoading(true);
+        const expenses = await getExpenses();
+        setExpenses(expenses);
+      } catch (error: any) {
+        setError(error.message);
+      }
+      setLoading(false);
     }
     fetchExpenses();
   }, []);
 
-  if (expenses.length === 0) {
+  if (error) {
+    return <ErrorOverlay message={error} />;
+  }
+
+  if (loading) {
     return (
       <LoadingOverlay
         styleContainer={styles.indicatorContainer}
